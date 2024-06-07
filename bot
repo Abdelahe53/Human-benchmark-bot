@@ -1,0 +1,76 @@
+import time
+import pyautogui
+import mouse
+import random
+
+def human_move(x, y, duration=0.2):
+    # Get current mouse position
+    start_x, start_y = pyautogui.position()
+
+    # Move the mouse in a smooth, curved trajectory
+    control_points = [
+        (start_x, start_y),
+        (start_x + random.randint(-100, 100), start_y + random.randint(-100, 100)),
+        (x + random.randint(-100, 100), y + random.randint(-100, 100)),
+        (x, y)
+    ]
+
+    pyautogui.moveTo(x, y, duration=duration, tween=pyautogui.easeInOutQuad)
+
+def record(num_tiles, coords):
+    # Move mouse out of the way
+    mouse.move(100, 100)
+    tiles = []
+    while len(tiles) < num_tiles:
+        for coord_num, (x, y) in enumerate(coords):
+            # If pixel is white (lit up)
+            if pyautogui.pixelMatchesColor(x, y, (255, 255, 255)):
+                tiles.append(coord_num)
+                # Wait for that tile to fade so we don't add it multiple times
+                while pyautogui.pixelMatchesColor(x, y, (255, 255, 255)):
+                    pass
+    return tiles
+
+def repeat(sequence, coords):
+    # Click on every tile in sequence in order
+    for index in sequence:
+        x, y = coords[index]
+        human_move(x, y, duration=random.uniform(0.2, 0.5))
+        pyautogui.click()
+        time.sleep(random.uniform(0.1, 0.3))
+
+# Find 3x3 grid
+grid_loc = None
+while not grid_loc:
+    try:
+        grid_loc = pyautogui.locateOnScreen('grid.png', confidence=0.7)
+        if not grid_loc:
+            print("Grid not found. Make sure 'grid.png' is accurate and visible on screen.")
+            time.sleep(1)
+    except Exception as e:
+        print(f"Error locating grid: {e}")
+        time.sleep(1)
+
+if grid_loc:
+    xs = [int(grid_loc.left + grid_loc.width // 6 + i * grid_loc.width // 3) for i in range(3)]
+    ys = [int(grid_loc.top + grid_loc.height // 6 + i * grid_loc.height // 3) for i in range(3)]
+
+    # Contain 9 coordinates at indexes 0-8
+    coords = []
+    for y in ys:
+        for x in xs:
+            coords.append((x, y))
+
+    # Run the program
+    num_tiles = 1
+    while True:
+        # Get the sequence that the game gives us
+        sequence = record(num_tiles, coords)
+        time.sleep(0.5)
+
+        # Play sequence back
+        repeat(sequence, coords)
+        num_tiles += 1
+        time.sleep(0.5)
+else:
+    print("Failed to locate the grid. Exiting.")
