@@ -3,14 +3,14 @@ I made this bot just to practice python, i also used youtube tutorials, the spec
 
 # Instructions:
  - Install the packages
-    ||mouseinfo
-    ||mouse
-    ||pythonautogui
-    ||pygetwindow
-    ||pymsgbox
-    ||pyrect
-    ||numpy
-    ||opencv
+    |mouseinfo
+    |mouse
+    |pythonautogui
+    |pygetwindow
+    |pymsgbox
+    |pyrect
+    |numpy
+    |opencv
 
    - Run the code(Human benchmark website should be open)
    - you can also run it without opening the code with a text editor, just left click on the file and it will open with CMD.
